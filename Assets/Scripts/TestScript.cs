@@ -11,7 +11,6 @@ public class TestScript : MonoBehaviour
 	[SerializeField] GameObject buttons;
 
 	private int count = 0;
-	//Transform wipeObj = null;
 
 	[SerializeField]
 	[Range(0.001f, 0.3f)]

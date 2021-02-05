@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 259505403}
   - component: {fileID: 259505402}
   m_Layer: 5
-  m_Name: "\u80CC\u666F"
+  m_Name: back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -228,7 +228,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onSelect: 0
-  buttonParent: {fileID: 690697384}
+  uiObj: {fileID: 0}
+  textNum: 0
 --- !u!4 &588686970
 Transform:
   m_ObjectHideFlags: 0
@@ -293,6 +294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dd26329f3b32d84f80b3dee379e4c74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SelectObj: {fileID: 0}
 --- !u!1 &759567652
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,7 +510,7 @@ GameObject:
   - component: {fileID: 911278691}
   - component: {fileID: 911278690}
   m_Layer: 5
-  m_Name: "\u4EBA\u7269"
+  m_Name: chara
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

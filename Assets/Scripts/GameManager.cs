@@ -4,17 +4,21 @@ using UnityEngine.UI;
 class GameManager : Singleton<GameManager>
 {
     public bool onSelect = false;
+    [SerializeField] GameObject uiObj = null;
     private Image backImg = null;
     private Image charaImg = null;
     public int textNum = 0;
     public int SelectNum { get; set; }//ナンバー
+
     //判定
     private static int num = 0;
     private static string strin = null;
 
     void Start()
     {
-
+        uiObj = GameObject.Find("Canvas");
+        backImg = uiObj.transform.GetChild(0).GetComponent<Image>();
+        charaImg = uiObj.transform.GetChild(1).GetComponent<Image>();
     }
 
     void Update()
@@ -42,14 +46,14 @@ class GameManager : Singleton<GameManager>
             //キャラ = string,背景 = int
             if (Regex.Match(stg,"[0-9]").Success)
             {
+                backImg = (Image)Resources.Load(stg);
                 Debug.Log("int" + stg);
             }
             else if(Regex.Match(stg,"[a-z]").Success)
             {
+                charaImg = (Image)Resources.Load(stg);
                 Debug.Log("string" + stg);
             }
-            Resources.Load(stg);//どこに？
-
         }
 
         if (selector)
@@ -58,6 +62,5 @@ class GameManager : Singleton<GameManager>
             SelectNum = int.Parse(n);
             Debug.Log("数" + SelectNum);
         }
-        //Resources.Load(stg);
     }
 }

@@ -20,8 +20,7 @@ public class SelectButton : MonoBehaviour
         SelectObj = gameObject;
         for (int i = 0; i < SelectObj.transform.childCount; i++)
         {
-            selects[i] = SelectObj.transform.GetChild(i).gameObject;
-            selectButton[i] = selects[i].GetComponent<Button>();
+            selectButton[i] = SelectObj.transform.GetChild(i).gameObject.GetComponent<Button>();
         }
     }
 
