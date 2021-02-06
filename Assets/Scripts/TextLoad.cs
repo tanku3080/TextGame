@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using UnityEngine;
 using UnityEngine.UI;
 
 //今後の課題：選択肢を動的に増やすことが出来るようにする。シェーダーについての理解を深める。
@@ -6,8 +9,8 @@ using UnityEngine.UI;
 public class TextLoad : MonoBehaviour
 {
 	private string[] unit;
-	private Image[] backImgs = null;
-	private Image[] charaImgs = null;
+	private Image backImgs = null;
+	private Image charaImgs = null;
     Text uiText;
 	[SerializeField] AudioClip nextButtonSfx;
 	[SerializeField] GameObject buttons;
@@ -25,6 +28,8 @@ public class TextLoad : MonoBehaviour
     private float timeElapsed = 1;
 	private int currentLine = 0;
 	private int lastUpdateCharacter = -1;
+	private int backKeepNum = 0;
+	private int charaKeepNum = 0;
 	bool SelectFlag { get { return GameManager.Instance.onSelect; } set {; } }
 	TextAsset asset;
 
@@ -43,14 +48,27 @@ public class TextLoad : MonoBehaviour
 		unit = stringNum.Split('\n');
         for (int i = 0; i < unit.Length; i++)
         {
-            if (unit[i].Contains("@"))//画像を判定する。背景画像は全て「@ + Number」の形式で保存する
+            if (unit[i].Contains("@") || unit[i].Contains("!"))
             {
-				GameManager.Instance.ImageOn(unit[i],true);
+				if (unit[i].Contains("@"))//画像を判定する。背景画像は全て「@ + Number」の形式で保存する
+				{
+					GameManager.Instance.ImageSet(unit[i], true);
+				}
+				else if (unit[i].Contains("!"))
+				{
+					GameManager.Instance.ImageSet(unit[i], false, true);
+				}
 			}
-            else if (unit[i].Contains("!"))
-            {
-				GameManager.Instance.ImageOn(unit[i],false,true);
-            }
+		}
+		//?
+		List<string> a = unit.ToList();
+		a.AddRange(unit);
+		foreach (var item in a)
+		{
+			if (item == null)
+			{
+				a.Remove(item);
+			}
 		}
 		audio = this.gameObject.GetComponent<AudioSource>();
 		SetNextLine();
@@ -96,14 +114,23 @@ public class TextLoad : MonoBehaviour
 	void SetNextLine()
 	{
 		currentText = unit[currentLine];
-		if (currentText != "@" || currentText != "!")
-		{
-			timeUntilDisplay = currentText.Length * intervalForCharacterDisplay;
-			timeElapsed = Time.time;
-			currentLine++;
-			count++;
-			lastUpdateCharacter = -1;
+		//消す
+        if (Regex.Match(currentText,"[1-9]").Success)
+        {
+			backImgs = Resources.Load<Image>(GameManager.Instance.backImgName[backKeepNum]);
+			backKeepNum++;
+			currentLine += 2;
+        }
+        else if (Regex.Match(currentText,"[a-z]").Success)
+        {
+			charaImgs = Resources.Load<Image>(GameManager.Instance.backImgName[charaKeepNum]);
+			charaKeepNum++;
+			currentLine += 2;
 		}
-		else currentLine++;
+		timeUntilDisplay = currentText.Length * intervalForCharacterDisplay;
+		timeElapsed = Time.time;
+		currentLine++;
+		count++;
+		lastUpdateCharacter = -1;
 	}
 }
