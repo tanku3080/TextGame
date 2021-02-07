@@ -4,9 +4,11 @@ using UnityEngine.UI;
 public class SelectButton : Singleton<SelectButton>
 {
     [SerializeField] GameObject SelectObj = null;
-    private GameObject[] selects = null;
     private Button[] selectButton = null;
+    [SerializeField] Sprite selectImg = null;
+
     TextAsset asset;
+    //下2つの配列はボタンが表示されたら使う予定だった。
     Text[] text;
     string[] unit;
 
@@ -17,6 +19,9 @@ public class SelectButton : Singleton<SelectButton>
         unit = stringNum.Split('\n');
     }
 
+    /// <summary>
+    /// ボタンをselectButton[]の中にいれて管理するスクリプトだったがエラーが出た。
+    /// </summary>
     public void SelectStart()
     {
         SelectButtonCreate(gameObject);
@@ -24,43 +29,44 @@ public class SelectButton : Singleton<SelectButton>
         for (int i = 0; i < SelectObj.transform.childCount; i++)
         {
             Debug.Log("始まった");
-            //selectButton[i] = SelectObj.transform.GetChild(i).gameObject.GetComponent<Button>();
+            selectButton[i] = SelectObj.transform.GetChild(i).gameObject.GetComponent<Button>();
         }
     }
 
-    //オブジェクトに選択肢を子オブジェクト化する
+    //テキスト内のコマンド文がから数値を抽出してその数分のボタンオブジェクトを作るメソッド
     void SelectButtonCreate(GameObject obj)
     {
         for (int i = 0; i < GameManager.Instance.SelectNum; i++)
         {
             var o = new GameObject($"Button{i}");
-            o.gameObject.AddComponent<RectTransform>();
-            o.gameObject.GetComponent<RectTransform>().anchorMin = new Vector2(0,0);
-            o.gameObject.GetComponent<RectTransform>().anchorMax = new Vector2(1,1);
             o.gameObject.AddComponent<CanvasRenderer>();
             o.gameObject.AddComponent<VerticalLayoutGroup>();
             o.gameObject.AddComponent<LayoutElement>();
             o.gameObject.AddComponent<Image>();
+            o.gameObject.GetComponent<Image>().sprite = Resources.Load<Sprite>(selectImg.name);
             o.gameObject.AddComponent<Button>();
+            o.gameObject.GetComponent<Button>().onClick.AddListener(OnclickEvent);
             o.gameObject.AddComponent<ContentSizeFitter>();
-            o.transform.parent = obj.transform;
+            o.transform.SetParent(obj.transform);
             o.layer = 5;
 
-            var t = new GameObject($"Text{i}");
-            t.gameObject.AddComponent<RectTransform>();
-            t.gameObject.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
-            t.gameObject.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
+            var t = new GameObject($"Text");
             t.gameObject.AddComponent<CanvasRenderer>();
             t.gameObject.AddComponent<Text>();
             t.gameObject.GetComponent<Text>().font = Resources.Load<Font>("komorebi-gothic-P");
-            t.transform.parent = o.transform;
+            t.transform.SetParent(o.transform);
             t.layer = 5;
 
         }
+        GameManager.Instance.onSelect = false;
     }
 
-    void Update()
+    /// <summary>
+    /// ボタンがclickされたときに使うメソッドだった
+    /// </summary>
+    public void OnclickEvent()
     {
-        
+        string t = gameObject.name;
+        Debug.Log(t);
     }
 }
