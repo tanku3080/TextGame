@@ -28,8 +28,8 @@ public class SelectButton : Singleton<SelectButton>
         SelectObj = gameObject;
         for (int i = 0; i < SelectObj.transform.childCount; i++)
         {
-            Debug.Log("始まった");
-            selectButton[i] = SelectObj.transform.GetChild(i).gameObject.GetComponent<Button>();
+            //Debug.Log("始まった");
+            //selectButton[i] = SelectObj.transform.GetChild(i).gameObject.GetComponent<Button>();
         }
     }
 
@@ -58,7 +58,6 @@ public class SelectButton : Singleton<SelectButton>
             t.layer = 5;
 
         }
-        GameManager.Instance.onSelect = false;
     }
 
     /// <summary>

@@ -12,6 +12,7 @@ public class TextLoad : MonoBehaviour
 	Text uiText;
 	[SerializeField] AudioClip nextButtonSfx;
 	[SerializeField] GameObject buttons;
+	bool onSelect = false;
 
 
 	public List<string> backImgName = new List<string> { };
@@ -32,7 +33,6 @@ public class TextLoad : MonoBehaviour
 	private int lastUpdateCharacter = -1;
 	private int backKeepNum = 0;
 	private int charaKeepNum = 0;
-	bool SelectFlag { set { GameManager.Instance.onSelect = value; } get { return GameManager.Instance.onSelect; } }
 	TextAsset asset;
 
 	// 文字の表示が完了しているかどうか
@@ -64,12 +64,9 @@ public class TextLoad : MonoBehaviour
 						charaImgName.Add(unit[i]);
 					}
 				}
-				else if (unit[i].Contains("!"))
+				else if (Regex.Match(unit[i],"[!]").Success)
 				{
-					var t =  unit[i].Replace("!", "");
-					GameManager.Instance.SelectNum = int.Parse(t);
-					unit[i].Replace($"{unit[i]}",string.Empty);
-					Debug.Log("数" + GameManager.Instance.SelectNum);
+					GameManager.Instance.SelectNum = int.Parse(unit[i].Replace("!",""));
 				}
 			}
 		}
@@ -79,6 +76,14 @@ public class TextLoad : MonoBehaviour
 
 	void Update()
 	{
+		//ボタンを作成、表示する条件式
+		if (onSelect)
+		{
+			SelectButton.Instance.SelectStart();
+			onSelect = false;
+		}
+
+
 		//表示するものが無いならこの条件式に入る
 		if (count == unit.Length && Input.GetKeyDown(KeyCode.Return) || count == unit.Length && Input.GetMouseButtonDown(0))
 		{
@@ -115,50 +120,41 @@ public class TextLoad : MonoBehaviour
 	/// <summary>
 	/// 次の文字をセットするメソッド
 	/// </summary>
+	//背景、人物、選択肢を条件式で処理を行う。
+	//条件式に当てはまらなかったらシーンに表示される
 	void SetNextLine()
 	{
-		ImgFade();
+		currentText = unit[currentLine];
+
+		if (currentText == string.Empty) currentLine++;
+		//背景のコマンド文か確かめる
+		if (Regex.Match(currentText, "[0-9]").Success && Regex.Match(currentText, "[^!]").Success)
+		{
+			GameManager.Instance.backImg = Resources.Load<Image>(backImgName[backKeepNum]);
+			backKeepNum++;
+			currentLine++;
+			currentText = unit[currentLine];
+		}
+		//選択肢のコマンド文か確かめる
+		if (Regex.Match(currentText, "[!]").Success && Regex.Match(currentText,"[0-9]").Success)
+		{
+			//選択肢
+			onSelect = true;
+			currentText = unit[currentLine];		}
+		//キャラクターのコマンド文か確かめる
+		if (Regex.Match(currentText, "[a-z]").Success)
+		{
+			GameManager.Instance.charaImg.sprite = Resources.Load<Sprite>(charaImgName[charaKeepNum]);
+
+			charaKeepNum++;
+			currentLine++;
+			currentText = unit[currentLine];
+		}
 
 		timeUntilDisplay = currentText.Length * intervalForCharacterDisplay;
 		timeElapsed = Time.time;
 		currentLine++;
 		count++;
 		lastUpdateCharacter = -1;
-	}
-
-	/// <summary>
-	/// image画像を表示させるメソッド
-	/// </summary>
-	void ImgFade()
-	{
-		currentText = unit[currentLine];
-
-		//消す
-		if (Regex.Match(currentText, "[0-9]").Success)
-		{
-			GameManager.Instance.backImg.sprite = Resources.Load<Sprite>(backImgName[backKeepNum]);
-			backKeepNum++;
-			currentLine++;
-			currentText = unit[currentLine];
-		}
-        
-		if (Regex.Match(currentText,"[!]").Success)
-        {
-			//選択肢
-			unit[currentLine].Replace($"{currentText}", "");
-			Debug.Log("aa");
-			SelectFlag = true;
-			currentLine++;
-			currentText = unit[currentLine];
-		}
-		
-		if (Regex.Match(currentText, "[a-z]").Success)
-		{
-			GameManager.Instance.charaImg.sprite = Resources.Load<Sprite>(backImgName[charaKeepNum]);
-	
-			charaKeepNum++;
-			currentLine++;
-			currentText = unit[currentLine];
-		}
 	}
 }
